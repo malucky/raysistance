@@ -1,13 +1,11 @@
 $(function(){
-  window.App = {};
-
   /*prompt for name*/
-  $('form').submit(function(e){
+  $('#nameModal form').submit(function(e){
     e.preventDefault();
-    $('#myModal').modal('toggle');
-    window.userName = $('#nameInput').val();
+    $('#nameModal').modal('toggle');
+    window.App.userName = $('#nameInput').val();
+    window.App.players = new Players(window.App.playersCount);
   });
-  $('#myModal').modal();
-  
-  // window.App.name = prompt("what's your name??");
+
+  window.AppView = new AppView({model: new App() });
 });
