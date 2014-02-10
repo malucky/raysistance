@@ -16,7 +16,9 @@ chatFB.on('child_added', function(snapshot) {
   displayChatMessage(message.name, message.text);
 });
 var displayChatMessage = function(name, text) {
-  $('<div/>').text(text).prepend($('<em/>').text(name+': ')).appendTo($('#messagesDiv'));
+  var div = $('<div/>');
+  div.append(($('<div/>').text(text).prepend($('<em/>').text(name+': '))).prepend($('<i class="icon-user">')));
+  div.appendTo($('#messagesDiv'));
   $('#messagesDiv')[0].scrollTop = $('#messagesDiv')[0].scrollHeight;
 };
 });
