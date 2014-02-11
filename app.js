@@ -95,19 +95,31 @@ var Players = Backbone.Firebase.Collection.extend({
 /****************** views ************************/
 
 var AppView = Backbone.View.extend({
+  el: $('body'),
+
+  events: {
+    'click #chooseTeamButton': "chooseTeam"
+  },
 
   initialize: function(){
     this.playersView = new PlayersView( {collection: this.model.players} );
 
-    this.listenTo(this.model, 'change : gamestart', this.distributeIdentities);
+    this.listenToOnce(this.model, 'change : gamestart', this.distributeIdentities);
+  },
 
+  chooseTeam: function(e) {
+    e.preventDefault();
+    console.log('enable team choose');
+    $('#chooseTeamButton').attr('disabled', 'disabled');
   },
 
   distributeIdentities: function() {
     console.log('in AppView distributing identities');
-        //run game logic only on the leader to avoid conflict
+
+    //run game logic only on the leader to avoid conflict
     if ( window.playerName === this.model.players.models[0].get('name') ) {
-      alert('your are the leader!!');
+      alert('you are the leader!!');
+      $('#chooseTeamButton').removeAttr('disabled');
       var shuffled = _.shuffle([1,2,3,4,5,6,7,8]);
       for (var i = 0; i < this.model.players.length; i++) {
         var identity = shuffled.pop();
@@ -117,7 +129,7 @@ var AppView = Backbone.View.extend({
           this.model.players.models[i].set({identity: 'resistance'});
         }
       }
-      App.model.set({'round': 1});
+      this.model.set({'round': 1});
     }
   }
 
