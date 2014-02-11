@@ -7,7 +7,7 @@ $(function(){
   $('#messageInput').keypress(function (e) {
     if (e.keyCode == 13) {
       var text = $('#messageInput').val();
-      chatFB.push({name: window.App.name, text: text});
+      chatFB.push({name: window.raysistanceApp.get('userName'), text: text});
       $('#messageInput').val('');
     }
   });
