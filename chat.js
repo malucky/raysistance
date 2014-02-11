@@ -7,7 +7,7 @@ $(function(){
   $('#messageInput').keypress(function (e) {
     if (e.keyCode == 13) {
       var text = $('#messageInput').val();
-      chatFB.push({name: window.raysistanceApp.get('userName'), text: text});
+      chatFB.push({name: window.playerName, text: text});
       $('#messageInput').val('');
     }
   });
@@ -17,7 +17,7 @@ $(function(){
   });
   var displayChatMessage = function(name, text) {
     var div = $('<div/>');
-    div.append(($('<div/>').text(text).prepend($('<em/>').text(name+': '))).prepend($('<i class="icon-user">')));
+    div.append(($('<div/>').text(text).prepend($('<em/>').text(name+': '))).prepend($('<i>')));
     div.appendTo($('#messagesDiv'));
     $('#messagesDiv')[0].scrollTop = $('#messagesDiv')[0].scrollHeight;
   };

@@ -6,11 +6,15 @@ var App = Backbone.Model.extend({
 
   firebase: new Firebase("https://dazzling-fire-9595.firebaseio.com/raysistance/logic"),
 
+  reqNumOfPlayers: 8, 
+
   initialize: function(){
 
     this.players = new Players();
 
     this.promptPlayerName();    //prompts for player name
+
+    this.startGame();
   },
 
   promptPlayerName: function() {
@@ -24,6 +28,20 @@ var App = Backbone.Model.extend({
     });
 
     $('#nameModal').modal();
+  },
+
+  startGame: function() {
+    var that = this;
+    $('#startButton').click(function(e) {
+      e.preventDefault();
+      if (that.players.length === that.reqNumOfPlayers) {
+        alert("let's start!");
+      } else if (that.players.length < that.reqNumOfPlayers) {
+        alert("waiting for more players");
+      } else {
+        alert("too many players!");
+      }
+    });
   }
 });
 
