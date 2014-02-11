@@ -1,0 +1,30 @@
+doctype html
+html(lang="en")
+  head
+    title= "Raysistance"
+    // script(src='/app.js')
+    link(href='/')
+    // script(src='/socket.io/socket.io.js')
+  body
+    #main.row
+      #playerView.span12
+        header="Players"
+      #chat.span12
+        header="Chat"
+        #messagesDiv.table.table-bordered
+        textarea#messageInput(type='text', placeholder="Message")
+      button#startButton.btn(role='button')="Start Game!"
+      button#chooseTeamButton.btn(disabled, role='button')="Choose Your Team!"
+
+    script(src='http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js')
+    script(src='http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js')
+    script(src='/bower_components/backbone/backbone.js')
+    script(src='/bower_components/firebase/firebase.js')
+    script(src='/bower_components/backfire/backbone-firebase.js')
+    script(src='/bootstrap/js/bootstrap.js')
+    link(rel='stylesheet', type='text/css', href='./bootstrap/css/bootstrap.css')
+    link(rel='stylesheet', type='text/css', href='./styles.css')
+    // main.js
+    script(src='/main.js')
+    script(src='/app.js')
+    script(src='/chat.js')
