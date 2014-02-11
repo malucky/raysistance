@@ -1,0 +1,28 @@
+{
+  "name": "backfire",
+  "version": "0.3.0",
+  "main": [
+    "./backbone-firebase.js",
+    "./backbone-firebase.min.js"
+  ],
+  "ignore": [
+    "Gruntfile.js",
+    "package.json",
+    "examples",
+    "index.html"
+  ],
+  "dependencies": {
+    "backbone": "<=1.1.0"
+  },
+  "homepage": "https://github.com/firebase/backfire",
+  "_release": "0.3.0",
+  "_resolution": {
+    "type": "version",
+    "tag": "v0.3.0",
+    "commit": "35e3eb3383316e306f73fc35cc205b3ea62c984c"
+  },
+  "_source": "git://github.com/firebase/backfire.git",
+  "_target": "~0.3.0",
+  "_originalSource": "backfire",
+  "_direct": true
+}

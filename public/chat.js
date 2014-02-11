@@ -1,27 +1,27 @@
-window.onload = function() {
-  console.log('loaded');
-  var messages = [];
-  var socket = io.connect('http://localhost:3700');
-  var field = document.getElementById("field");
-  var sendButton = document.getElementById("send");
-  var content = document.getElementById("content");
-                   
-  socket.on('message', function (data) {
-    if(data.message) {
-      messages.push(data.message);
-      var html = '';
-      for(var i=0; i<messages.length; i++) {
-        html += messages[i] + '<br />';
-      }
-      content.innerHTML = html;
-    } else {
-      console.log("There is a problem:", data);
+
+//copied with minor changes from firebase example
+$(function(){
+
+  var chatFB = new Firebase('https://dazzling-fire-9595.firebaseio.com/raysistance/chat');
+
+  $('#messageInput').keypress(function (e) {
+    if (e.keyCode == 13) {
+      var text = $('#messageInput').val();
+      chatFB.push({name: 'ray', text: text});
+      $('#messageInput').val('');
     }
   });
+  chatFB.on('child_added', function(snapshot) {
+    var message = snapshot.val();
+    displayChatMessage(message.name, message.text);
+  });
+  var displayChatMessage = function(name, text) {
+    var template = _.template($('#fireMessage').html());
+    $('#messagesDiv').append(template({
+      name: name,
+      text: text
+    }));
+    $('#messagesDiv')[0].scrollTop = $('#messagesDiv')[0].scrollHeight;
+  };
 
-  sendButton.onclick = function() {
-    console.log('clicking');
-    var text = field.value;
-    socket.emit('send', { message: text });
-  };                               
-}
+});
