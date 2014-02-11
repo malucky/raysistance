@@ -27,3 +27,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3b679e', end
 .playerImg {
   background-image: url('./img/spy.png');
 }
+
+.playerView {
+  margin: 5px;
+}

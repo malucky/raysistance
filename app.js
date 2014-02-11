@@ -1,5 +1,9 @@
 /* Backbone models, views, and collections */
 
+var me = {
+  currLeader: false,
+  team: []
+};
 /************* models and collections ***************/
 
 var App = Backbone.Firebase.Model.extend({
@@ -18,13 +22,9 @@ var App = Backbone.Firebase.Model.extend({
 
     this.startGame();
 
-    this.on('change : gameStart', this.startNewGame);
-  },
+    this.teamMembers = [];
 
-  findCurrLeader: function() {
-    if ( window.playerName === this.players.models[this.currLeader].get('name') ) {
-      alert("you're the leader!");
-    }
+    this.on('change : gameStart', this.startNewGame);
   },
 
   promptPlayerName: function() {
@@ -53,12 +53,7 @@ var App = Backbone.Firebase.Model.extend({
         alert("too many players!");
       }
     });
-  },
-
-  startNewGame: function() {
-      console.log('new game starting');
   }
-
 });
 
 var Player = Backbone.Model.extend({
@@ -119,6 +114,7 @@ var AppView = Backbone.View.extend({
     //run game logic only on the leader to avoid conflict
     if ( window.playerName === this.model.players.models[0].get('name') ) {
       alert('you are the leader!!');
+      me.currLeader = true;
       $('#chooseTeamButton').removeAttr('disabled');
       var shuffled = _.shuffle([1,2,3,4,5,6,7,8]);
       for (var i = 0; i < this.model.players.length; i++) {
@@ -157,7 +153,11 @@ var PlayersView = Backbone.View.extend({
 
 var PlayerView = Backbone.View.extend({
 
-  className: 'span3 offset2',
+  className: 'span3 offset2 playerView',
+
+  events: {
+    'click': 'selected'
+  },
 
   template: _.template( $('#playerTemplate').html() ),
 
@@ -182,6 +182,19 @@ var PlayerView = Backbone.View.extend({
         $('#resistanceModal').modal();
       } else {
         $('#spyModal').modal();
+      }
+    }
+  },
+
+  selected: function() {
+    if (me.currLeader) {
+      var index = me.team.indexOf(this.model);
+      if (index === -1) {
+        me.team.push(this.model);
+        this.$el.css({'border': "1px dotted red"});
+      } else {
+        me.team.splice(index, 1);
+        this.$el.css({'border': "none"});
       }
     }
   }
