@@ -2,7 +2,7 @@
 
 /************* models and collections ***************/
 
-var App = Backbone.Model.extend({
+var App = Backbone.Firebase.Model.extend({
 
   firebase: new Firebase("https://dazzling-fire-9595.firebaseio.com/raysistance/logic"),
 
@@ -12,9 +12,13 @@ var App = Backbone.Model.extend({
 
     this.players = new Players();
 
+    // this.gameStart = false;
+
     this.promptPlayerName();    //prompts for player name
 
     this.startGame();
+
+    this.on('change', this.startNewGame);
   },
 
   promptPlayerName: function() {
@@ -35,16 +39,35 @@ var App = Backbone.Model.extend({
     $('#startButton').click(function(e) {
       e.preventDefault();
       if (that.players.length === that.reqNumOfPlayers) {
-        $('#startModal').modal();
-        if (window.playerName === that.players.models[0].get('name')) {
-          alert('your are the leader!!');
-        }
+        // $('#startModal').modal();
+        // //run game logic only on the leader to avoid conflict
+        // if (window.playerName === that.players.models[0].get('name')) {
+        //   alert('your are the leader!!');
+        //   that.distributeIdentities();
+        // }
+        that.set( {'gameStart': true} );
       } else if (that.players.length < that.reqNumOfPlayers) {
         alert("waiting for more players");
       } else {
         alert("too many players!");
       }
     });
+  },
+
+  startNewGame: function() {
+      console.log('new game starting');
+  },
+
+  distributeIdentities: function() {
+    var shuffled = _.shuffle([1,2,3,4,5,6,7,8]);
+    for (var i = 0; i < this.players.length; i++) {
+      var identity = shuffled.pop();
+      if (identity < 4) {
+        this.players.models[i].set({identity: 'spy'});
+      } else {
+        this.players.models[i].set({identity: 'resistance'});
+      }
+    }
   }
 
 });
@@ -67,10 +90,9 @@ var Players = Backbone.Firebase.Collection.extend({
   firebase: new Firebase("https://dazzling-fire-9595.firebaseio.com/raysistance/players"),
 
   initialize: function(){
-    // window.vent.listenTo(this, 'add', function(player) {
-    console.log('a player added to players');
-      // window.vent.trigger('newModelAdded', player);
-    // });
+    this.on('destroy', function() {
+      console.log('listened to destroy in collection');
+    });
   },
 
   makePlayer: function(playerName){
@@ -128,6 +150,10 @@ var PlayerView = Backbone.View.extend({
   render: function(){
     this.$el.html( this.template(this.model.toJSON()) );
     return this;
+  },
+
+  initialize: function() {
+    this.listenTo(this.model, 'destroy', this.remove);
   }
 
 });
