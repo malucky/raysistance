@@ -24,6 +24,8 @@ var App = Backbone.Firebase.Model.extend({
 
     this.teamMembers = [];
 
+    this.voting = false;
+
     this.on('change : gameStart', this.startNewGame);
   },
 
@@ -77,6 +79,7 @@ var Players = Backbone.Firebase.Collection.extend({
     this.on('destroy', function() {
       console.log('listened to destroy in collection');
     });
+    this.selected = false;
   },
 
   makePlayer: function(playerName){
@@ -98,14 +101,33 @@ var AppView = Backbone.View.extend({
 
   initialize: function(){
     this.playersView = new PlayersView( {collection: this.model.players} );
-
     this.listenToOnce(this.model, 'change : gamestart', this.distributeIdentities);
+    this.listenTo(this.model, 'change : voting', this.promptVote);
   },
 
   chooseTeam: function(e) {
     e.preventDefault();
-    console.log('enable team choose');
-    $('#chooseTeamButton').attr('disabled', 'disabled');
+    if (me.team.length !== 3) {
+      alert('you need to choose 3 members for this mission');
+      return;
+    } else {
+      this.model.set({
+        'voting': true,
+        'teamMembers': me.team
+      });
+      $('#chooseTeamButton').attr('disabled', 'disabled');
+    }
+  },
+
+  promptVote: function() {
+    $('approveButton').click(function(e){
+      e.preventDefault();
+    });
+    $('disapproveButton').click(function(e){
+      e.preventDefault();
+      this.model.set('disapproveVotes', this.model.get('disapproveVotes').push(window.playerName));
+    });
+    $('#votingModal').modal();
   },
 
   distributeIdentities: function() {
@@ -170,6 +192,7 @@ var PlayerView = Backbone.View.extend({
     this.listenTo(this.model, 'destroy', this.remove);
     this.listenTo(this.model, 'change', this.modelChanged);
     this.listenTo(this.model, 'change : identity', this.showIdentity);
+    this.listenTo(this.model, 'change : selected', this.toggleSelected);
   },
 
   modelChanged: function() {
@@ -190,15 +213,21 @@ var PlayerView = Backbone.View.extend({
     if (me.currLeader) {
       var index = me.team.indexOf(this.model);
       if (index === -1) {
+        this.model.set('selected', 'true');
         me.team.push(this.model);
-        this.$el.css({'border': "1px dotted red"});
       } else {
         me.team.splice(index, 1);
-        this.$el.css({'border': "none"});
       }
     }
-  }
+  },
 
+  toggleSelected: function() {
+    if (this.model.selected === true) {
+      this.$el.css({'border': "1px dotted red"});
+    } else {
+      this.$el.css({'border': "none"});
+    }
+  }
 });
 
 
