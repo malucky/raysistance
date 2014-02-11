@@ -1,31 +1,33 @@
 /* Backbone models, views, and collections */
 
+/************* models and collections ***************/
+
 var App = Backbone.Model.extend({
+
   firebase: new Firebase("https://dazzling-fire-9595.firebaseio.com/raysistance/logic"),
 
-  currRound: 0,
-
-  playersCount: 8,
-
-  curPlayer: null,
-
   initialize: function(){
+
+    this.players = new Players();
+
+    this.promptPlayerName();    //prompts for player name
+  },
+
+  promptPlayerName: function() {
+    var that = this;
+    $('#nameForm').submit(function(e){
+      e.preventDefault();
+      $('#nameModal').modal('toggle');
+      window.playerName = $('#nameInput').val();
+
+      that.players.makePlayer( window.playerName );
+    });
+
+    $('#nameModal').modal();
   }
-
 });
-
-var AppView = Backbone.View.extend({
-  initialize: function(){
-    this.playersView = new PlayersView();
-  }
-});
-
 
 var Player = Backbone.Model.extend({
-
-  leader: false,
-
-  resistance: false,
 
   initialize: function(){
     this.leader = false;
@@ -36,114 +38,76 @@ var Player = Backbone.Model.extend({
   }
 });
 
-
 var Players = Backbone.Firebase.Collection.extend({
+
   model: Player,
 
   firebase: new Firebase("https://dazzling-fire-9595.firebaseio.com/raysistance/players"),
 
-  defaults: {
-    'playerCount': 8
+  initialize: function(){
+    // window.vent.listenTo(this, 'add', function(player) {
+    console.log('a player added to players');
+      // window.vent.trigger('newModelAdded', player);
+    // });
   },
+
+  makePlayer: function(playerName){
+    this.add( {name: playerName} );
+  }
+});
+
+
+
+
+/****************** views ************************/
+
+var AppView = Backbone.View.extend({
 
   initialize: function(){
-    this.on('add', function(player){
-      window.vent.trigger('newPlayer', player);
-    });
-    this.makePlayer();
-  },
 
-  makePlayer: function(){
-    var obj = { name: window.raysistanceApp.get('userName')};
-    this.add(obj);
+    this.playersView = new PlayersView( {collection: this.model.players} );
   }
 
 });
 
+
 var PlayersView = Backbone.View.extend({
+
   el: $('#playersView'),
 
-  events: {
-
-  },
-
   initialize: function(){
-    _.bindAll(this, 'addOne');
-    window.vent.on('newPlayer', this.addOne);
-  },
-
-  render: function() {
-    // for (var i = 0; i < window.raysistanceApp.playersCount; i++) {
-    // }
+    // _.bindAll(this, 'addOne');
+    // window.vent.on('newModelAdded', this.addOne);
+    this.listenTo(this.collection, 'add', this.addOne);
   },
 
   addOne: function(player) {
-    var view = new PlayerView({model: player});
+    var view = new PlayerView( {model: player} );
     this.$el.append(view.render().el);
-  },
 
-  addAll: function() {
-    this.$el.html("");
-    this.collection.each(this.addOne, this);
-  }
-});
-
-// var AppView = Backbone.View.extend({
-
-//     events: {
-//       "keypress #new-todo":  "createOnEnter",
-//       "click #clear-completed": "clearCompleted",
-//       "click #toggle-all": "toggleAllComplete"
-//     },
-
-//     initialize: function() {
-//       this.input = this.$("#new-todo");
-//       this.allCheckbox = this.$("#toggle-all")[0];
-
-//       this.listenTo(Todos, 'add', this.addOne);
-//       this.listenTo(Todos, 'reset', this.addAll)
-//       this.listenTo(Todos, 'all', this.render);
-
-//       this.footer = this.$('footer');
-//       this.main = $('#main');
-//     },
-
-    // render: function() {
-    //   var done = Todos.done().length;
-    //   var remaining = Todos.remaining().length;
-
-    //   if (Todos.length) {
-    //     this.main.show();
-    //     this.footer.show();
-    //     this.footer.html(this.statsTemplate({done: done, remaining: remaining}));
-    //   } else {
-    //     this.main.hide();
-    //     this.footer.hide();
+    // if (this.collection.length === this.collection.playersCount) {
+    //   //can start game
+    //   //to avoid overlapping logic, the client player that is the leader will be running the logic
+    //   if ($('#nameInput').val() === player.get('name')) {
+    //     console.log("I'm the leader!");
     //   }
+    // }
+  }
 
-    //   this.allCheckbox.checked = !remaining;
-    // },
-
-    // addOne: function(todo) {
-    //   var view = new TodoView({model: todo});
-    //   this.$("#todo-list").append(view.render().el);
-    // },
-
-    // addAll: function() {
-    //   this.$("#todo-list").html("");
-    //   Todos.each(this.addOne, this);
-    // },
+});
 
 
 var PlayerView = Backbone.View.extend({
+
   className: 'span3 offset2',
 
-  template: _.template($('#playerTemplate').html()),
+  template: _.template( $('#playerTemplate').html() ),
 
   render: function(){
-    this.$el.html(this.template(this.model.toJSON()));
+    this.$el.html( this.template(this.model.toJSON()) );
     return this;
   }
+
 });
 
 
