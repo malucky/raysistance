@@ -39,13 +39,29 @@
 
   <!-- start game prompt -->
   <!-- Modal -->
-  <div id="startModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div id="resistanceModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-      <h3 id="myModalLabel">Resitance Game Rules</h3>
+      <h3 id="myModalLabel">You're on the Resistance!!</h3>
     </div>
     <div class="modal-body">
-      <p>Some awesome descriptive narrative about the current dystopian world and how there are spies among you resistance...</p>
+      <p>Choose your team wisely...the fate of the future lies on YOUR shoulders!</p>
+      <img class='identity' src="./img/resistance.png">
+    </div>
+    <div class="modal-footer">
+      <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+      <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Continue</button>
+    </div>
+  </div>
+
+  <div id="spyModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+      <h3 id="myModalLabel">You are a SPY!!</h3>
+    </div>
+    <div class="modal-body">
+      <p>Your mission is to sabotage the mission! Become one of them ... gain their trust ... and foster discord</p>
+      <img class='identity' src="./img/spy_1.png">
     </div>
     <div class="modal-footer">
       <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>

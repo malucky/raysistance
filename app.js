@@ -104,10 +104,8 @@ var AppView = Backbone.View.extend({
   },
 
   distributeIdentities: function() {
-          // $('#startModal').modal();
     console.log('in AppView distributing identities');
         //run game logic only on the leader to avoid conflict
-        debugger;
     if ( window.playerName === this.model.players.models[0].get('name') ) {
       alert('your are the leader!!');
       var shuffled = _.shuffle([1,2,3,4,5,6,7,8]);
@@ -119,6 +117,7 @@ var AppView = Backbone.View.extend({
           this.model.players.models[i].set({identity: 'resistance'});
         }
       }
+      App.model.set({'round': 1});
     }
   }
 
@@ -158,10 +157,21 @@ var PlayerView = Backbone.View.extend({
   initialize: function() {
     this.listenTo(this.model, 'destroy', this.remove);
     this.listenTo(this.model, 'change', this.modelChanged);
+    this.listenTo(this.model, 'change : identity', this.showIdentity);
   },
 
   modelChanged: function() {
     console.log("model changed");
+  },
+
+  showIdentity: function() {
+    if ( window.playerName === this.model.get('name') ) { //if you are this player
+      if ( this.model.get('identity') === 'resistance') {//resistance
+        $('#resistanceModal').modal();
+      } else {
+        $('#spyModal').modal();
+      }
+    }
   }
 
 });
