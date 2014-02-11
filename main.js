@@ -3,9 +3,10 @@ $(function(){
   $('#nameModal form').submit(function(e){
     e.preventDefault();
     $('#nameModal').modal('toggle');
-    window.App.userName = $('#nameInput').val();
-    window.App.players = new Players(window.App.playersCount);
+    window.raysistanceApp.set({userName: $('#nameInput').val()});
+    window.raysistanceApp.players = new Players();
   });
 
-  window.AppView = new AppView({model: new App() });
+  window.raysistanceApp = new App();
+  window.raysistanceAppView = new AppView({model: window.raysistanceApp });
 });

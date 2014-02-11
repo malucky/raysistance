@@ -1,6 +1,6 @@
 /* Backbone models, views, and collections */
 
-var App = Backbone.Firebase.Model.extend({
+var App = Backbone.Model.extend({
   firebase: new Firebase("https://dazzling-fire-9595.firebaseio.com/raysistance/logic"),
 
   currRound: 0,
@@ -10,6 +10,7 @@ var App = Backbone.Firebase.Model.extend({
   curPlayer: null,
 
   initialize: function(){
+    this.vent = _.extend({}, Backbone.Events);
     $('#nameModal').modal();
   }
 
@@ -19,15 +20,21 @@ var AppView = Backbone.View.extend({
 });
 
 
-var Player = Backbone.Firebase.Model.extend({
+var Player = Backbone.Model.extend({
+
   leader: false,
 
   resistance: false,
 
   initialize: function(){
-    console.log('making player');
+    this.leader = false;
+  },
+
+  vote: function(){
+    //prompt for approve or deny
   }
 });
+
 
 var Players = Backbone.Firebase.Collection.extend({
   model: Player,
@@ -39,15 +46,12 @@ var Players = Backbone.Firebase.Collection.extend({
   },
 
   initialize: function(){
-    this.on('add', function(model){
-      console.log("model:", model);
-    });
     this.makePlayer();
+    console.log('made player');
   },
 
   makePlayer: function(){
-    var obj = { name: window.App.userName};
-    console.log('obj:', obj);
+    var obj = { name: window.raysistanceApp.get('userName')};
     this.add(obj);
   }
 
@@ -56,8 +60,6 @@ var Players = Backbone.Firebase.Collection.extend({
 var PlayersView = Backbone.View.extend({
 
 });
-
-
 
 
 var PlayerView = Backbone.View.extend({
