@@ -78,15 +78,14 @@ var PlayersView = Backbone.View.extend({
   },
 
   addOne: function(player) {
-    debugger;
     var view = new PlayerView({model: player});
     this.$el.append(view.render().el);
-  }
+  },
 
-  // addAll: function() {
-  //   this.$("#todo-list").html("");
-  //   Todos.each(this.addOne, this);
-  // }
+  addAll: function() {
+    this.$el.html("");
+    this.collection.each(this.addOne, this);
+  }
 });
 
 // var AppView = Backbone.View.extend({
@@ -137,7 +136,15 @@ var PlayersView = Backbone.View.extend({
 
 
 var PlayerView = Backbone.View.extend({
+  className: 'span3 offset2',
+
+  template: _.template($('#playerTemplate').html()),
+
   render: function(){
+    this.$el.html(this.template(this.model.toJSON()));
     return this;
   }
 });
+
+
+

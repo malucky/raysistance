@@ -1,0 +1,7 @@
+#playersView {
+  text-align: center;
+}
+
+.playerImg {
+  background-image: url('./img/spy.png');
+}

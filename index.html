@@ -6,8 +6,10 @@
 <body>
 
   <div id="main" class="row">
-    <div id="playersView" class="span6">PLAYER VIEW</div>
-    <div id="chat" class="span6">
+    <div id="playersView" class="span12">
+      <header>Players</header>
+    </div>
+    <div id="chat" class="span12">
       <header>Chat</header>
       <div id='messagesDiv'></div>
       <textarea type='text' id='messageInput' placeholder='Message'></textarea>
@@ -31,6 +33,10 @@
     </div>
   </div>
 
+  <script type="text/template" id="playerTemplate">
+    <header><%- name %></header>
+    <img src="./img/spy.png">
+  </script>
 
   <!-- libraries/frameworks -->
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
@@ -45,6 +51,8 @@
   <script src="./main.js"></script>
   <script src="./app.js"></script>
   <script src="./chat.js"></script>
+
+
 
 
 </body>
