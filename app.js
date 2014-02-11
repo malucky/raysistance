@@ -6,19 +6,25 @@ var App = Backbone.Firebase.Model.extend({
 
   firebase: new Firebase("https://dazzling-fire-9595.firebaseio.com/raysistance/logic"),
 
-  reqNumOfPlayers: 8, 
+  reqNumOfPlayers: 8,
 
   initialize: function(){
 
-    this.players = new Players();
+    this.currLeader = 0;
 
-    // this.gameStart = false;
+    this.players = new Players();
 
     this.promptPlayerName();    //prompts for player name
 
     this.startGame();
 
-    this.on('change', this.startNewGame);
+    this.on('change : gameStart', this.startNewGame);
+  },
+
+  findCurrLeader: function() {
+    if ( window.playerName === this.players.models[this.currLeader].get('name') ) {
+      alert("you're the leader!");
+    }
   },
 
   promptPlayerName: function() {
@@ -39,13 +45,8 @@ var App = Backbone.Firebase.Model.extend({
     $('#startButton').click(function(e) {
       e.preventDefault();
       if (that.players.length === that.reqNumOfPlayers) {
-        // $('#startModal').modal();
-        // //run game logic only on the leader to avoid conflict
-        // if (window.playerName === that.players.models[0].get('name')) {
-        //   alert('your are the leader!!');
-        //   that.distributeIdentities();
-        // }
         that.set( {'gameStart': true} );
+
       } else if (that.players.length < that.reqNumOfPlayers) {
         alert("waiting for more players");
       } else {
@@ -56,18 +57,6 @@ var App = Backbone.Firebase.Model.extend({
 
   startNewGame: function() {
       console.log('new game starting');
-  },
-
-  distributeIdentities: function() {
-    var shuffled = _.shuffle([1,2,3,4,5,6,7,8]);
-    for (var i = 0; i < this.players.length; i++) {
-      var identity = shuffled.pop();
-      if (identity < 4) {
-        this.players.models[i].set({identity: 'spy'});
-      } else {
-        this.players.models[i].set({identity: 'resistance'});
-      }
-    }
   }
 
 });
@@ -108,9 +97,31 @@ var Players = Backbone.Firebase.Collection.extend({
 var AppView = Backbone.View.extend({
 
   initialize: function(){
-
     this.playersView = new PlayersView( {collection: this.model.players} );
+
+    this.listenTo(this.model, 'change : gamestart', this.distributeIdentities);
+
+  },
+
+  distributeIdentities: function() {
+          // $('#startModal').modal();
+    console.log('in AppView distributing identities');
+        //run game logic only on the leader to avoid conflict
+        debugger;
+    if ( window.playerName === this.model.players.models[0].get('name') ) {
+      alert('your are the leader!!');
+      var shuffled = _.shuffle([1,2,3,4,5,6,7,8]);
+      for (var i = 0; i < this.model.players.length; i++) {
+        var identity = shuffled.pop();
+        if (identity < 4) {
+          this.model.players.models[i].set({identity: 'spy'});
+        } else {
+          this.model.players.models[i].set({identity: 'resistance'});
+        }
+      }
+    }
   }
+
 
 });
 
@@ -128,14 +139,6 @@ var PlayersView = Backbone.View.extend({
   addOne: function(player) {
     var view = new PlayerView( {model: player} );
     this.$el.append(view.render().el);
-
-    // if (this.collection.length === this.collection.playersCount) {
-    //   //can start game
-    //   //to avoid overlapping logic, the client player that is the leader will be running the logic
-    //   if ($('#nameInput').val() === player.get('name')) {
-    //     console.log("I'm the leader!");
-    //   }
-    // }
   }
 
 });
@@ -154,6 +157,11 @@ var PlayerView = Backbone.View.extend({
 
   initialize: function() {
     this.listenTo(this.model, 'destroy', this.remove);
+    this.listenTo(this.model, 'change', this.modelChanged);
+  },
+
+  modelChanged: function() {
+    console.log("model changed");
   }
 
 });
