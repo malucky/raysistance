@@ -14,9 +14,12 @@
       <div id='messagesDiv' class="table table-bordered"></div>
       <textarea type='text' id='messageInput' placeholder='Message'></textarea>
     </div>
-    <button id="startButton">Start Game!!</button>
+    <button role="button" class="btn" id="startButton">Start Game!</button>
   </div>
-  <!-- modal -->
+
+
+  <!-- *********************** modal ***************** -->
+  <!-- name prompt -->
   <div id="nameModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="nameModalLabel" aria-hidden="true">
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
@@ -34,6 +37,23 @@
     </div>
   </div>
 
+  <!-- start game prompt -->
+  <!-- Modal -->
+  <div id="startModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+      <h3 id="myModalLabel">Resitance Game Rules</h3>
+    </div>
+    <div class="modal-body">
+      <p>Some awesome descriptive narrative about the current dystopian world and how there are spies among you resistance...</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+      <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Continue</button>
+    </div>
+  </div>
+
+  <!-- ****************** templates *************** -->
   <script type="text/template" id="playerTemplate">
     <header><%- name %></header>
     <img src="./img/spy.png">

@@ -35,7 +35,10 @@ var App = Backbone.Model.extend({
     $('#startButton').click(function(e) {
       e.preventDefault();
       if (that.players.length === that.reqNumOfPlayers) {
-        alert("let's start!");
+        $('#startModal').modal();
+        if (window.playerName === that.players.models[0].get('name')) {
+          alert('your are the leader!!');
+        }
       } else if (that.players.length < that.reqNumOfPlayers) {
         alert("waiting for more players");
       } else {
@@ -43,6 +46,7 @@ var App = Backbone.Model.extend({
       }
     });
   }
+
 });
 
 var Player = Backbone.Model.extend({
