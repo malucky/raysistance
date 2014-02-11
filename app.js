@@ -68,6 +68,7 @@ var PlayersView = Backbone.View.extend({
   },
 
   initialize: function(){
+    _.bindAll(this, 'addOne');
     window.vent.on('newPlayer', this.addOne);
   },
 
@@ -76,10 +77,10 @@ var PlayersView = Backbone.View.extend({
     // }
   },
 
-  addOne: function() {
-    console.log('adding one');
-    // var view = new TodoView({model: todo});
-    // this.$("#todo-list").append(view.render().el);
+  addOne: function(player) {
+    debugger;
+    var view = new PlayerView({model: player});
+    this.$el.append(view.render().el);
   }
 
   // addAll: function() {
@@ -136,4 +137,7 @@ var PlayersView = Backbone.View.extend({
 
 
 var PlayerView = Backbone.View.extend({
+  render: function(){
+    return this;
+  }
 });
