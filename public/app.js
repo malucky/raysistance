@@ -46,7 +46,7 @@ var App = Backbone.Model.extend({
 var Player = Backbone.Model.extend({
 
   initialize: function(){
-    this.set('leader', false);
+    this.set('isLeader', false);
   },
 
   vote: function(){
@@ -63,8 +63,15 @@ var Players = Backbone.Collection.extend({
     });
   },
 
-  makePlayer: function(playerName, isMe){
-    this.add( {playerName: playerName, isMe: isMe} );
+  makePlayer: function(socketId, playerName, isMe){
+    var player = this.add({
+      socketId: socketId,
+      playerName: playerName, 
+      isMe: isMe
+    });
+    if (isMe) {
+      window.raysistanceApp.set('me', player);
+    }
   }
 });
 
@@ -78,7 +85,7 @@ var PlayerView = Backbone.View.extend({
   className: 'span3 offset2 playerView',
 
   events: {
-    // 'click': 'selected'
+    'click': 'selected'
   },
 
   template: _.template( $('#playerTemplate').html() ),
@@ -90,36 +97,22 @@ var PlayerView = Backbone.View.extend({
 
   initialize: function() {
     this.listenTo(this.model, 'destroy', this.remove);
-    this.listenTo(this.model, 'change', this.modelChanged);
+    this.listenTo(this.model, 'change : isLeader', this.modelChanged);
 // this.listenTo(this.model, 'change : identity', this.showIdentity);
     // this.listenTo(this.model, 'change : selected', this.toggleSelected);
+  },
+
+  modelChanged: function() {
+  },
+
+  selected: function() {
+    var that = this;
+    if (window.raysistanceApp.get('isLeader')) {
+      window.socket.emit('select', {
+        socketId: that.model.get('socketId')
+      });
+    }
   }
-
-  // modelChanged: function() 
-  //   console.log("model changed");
-  // }
-
-  // showIdentity: function() {
-  //   if ( window.playerName === this.model.get('name') ) { //if you are this player
-  //     if ( this.model.get('identity') === 'resistance') {//resistance
-  //       $('#resistanceModal').modal();
-  //     } else {
-  //       $('#spyModal').modal();
-  //     }
-  //   }
-  // },
-
-  // selected: function() {
-  //   if (me.currLeader) {
-  //     var index = me.team.indexOf(this.model);
-  //     if (index === -1) {
-  //       this.model.set('selected', 'true');
-  //       me.team.push(this.model);
-  //     } else {
-  //       me.team.splice(index, 1);
-  //     }
-  //   }
-  // },
 
   // toggleSelected: function() {
   //   if (this.model.selected === true) {
@@ -158,13 +151,24 @@ var AppView = Backbone.View.extend({
     this.playersView = new PlayersView( {collection: this.model.get('players')} );
     window.socket.on('socketId', function(data){
       that.model.set('socketId', data.socketId);
+      that.model.get('me').set('socketId', data.socketId);
     });
     window.socket.on('newPlayerJoined', function(data) {
-      that.model.get('players').makePlayer(data.playerName, false);
+      that.model.get('players').makePlayer(data.socketId, data.playerName, false);
     });
     window.socket.on('identity', function(data) {
       that.model.set('identity', data.identity);
       that.displayIdentity();
+    });
+    window.socket.on('leader', function(data) {
+      that.model.set('isLeader', true);
+      that.model.get('me').set('isLeader', true);
+    });
+    window.socket.on('nominateMember', function(data) {
+      console.log('member added');
+    });
+    window.socket.on('removeMember', function(data) {
+      console.log('member removed');
     });
     this.promptPlayerName();
   },
@@ -178,7 +182,7 @@ var AppView = Backbone.View.extend({
       window.socket.emit('newPlayer', {
         playerName: that.model.get('playerName')
       });
-      that.model.get('players').makePlayer( that.model.get('playerName'), true );
+      that.model.get('players').makePlayer(that.model.get('socketId'), that.model.get('playerName'), true );
     });
     $('#nameModal').modal();
   },

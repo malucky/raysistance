@@ -21,7 +21,7 @@ var game = {
   requiredNumOfPlayers: 2,  //for testing ********
   currLeader: null,
   players: [],
-  currTeam: [],
+  currTeam: {},
   round: 0
 };
 
@@ -43,6 +43,8 @@ var distributeIdentities = function() {
 
 var startGame = function() {
   distributeIdentities();
+  game.currLeader = 0;
+  game.players[game.currLeader][0].emit('leader', {});
 };
 
 
@@ -53,13 +55,32 @@ io.sockets.on('connection', function (socket) {
   //new player created
   socket.on('newPlayer', function (data) {
     _.each(game.players, function(player) {
-      socket.emit('newPlayerJoined', player[1]);
+      socket.emit('newPlayerJoined', {
+        socketId: player[0].id,
+        playerName: player[1].playerName
+      });
     });
     game.players.push([socket, data]);
     socket.emit('socketId', {socketId: socket.id});
-    socket.broadcast.emit('newPlayerJoined', data);
+    socket.broadcast.emit('newPlayerJoined', {
+        socketId: socket.id,
+        playerName: data.playerName
+    });
     if (game.players.length === game.requiredNumOfPlayers) {
       startGame();
+    }
+  });
+  socket.on('select', function(data) {
+    if (game.currTeam[data.socketId]) {
+      game.currTeam[data.socketId] = false;
+      io.sockets.emit('removeMember', {
+        socketId: data.socketId
+      });
+    } else {
+      game.currTeam[data.socketId] = true;
+      io.sockets.emit('nominateMember', {
+        socketId: data.socketId
+      });
     }
   });
 });
