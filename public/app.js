@@ -1,18 +1,6 @@
 /* Backbone models, views, and collections */
 //local storage
 
-  // socket.on('message', function (data) {
-  //   if(data.message) {
-  //     messages.push(data.message);
-  //     var html = '';
-  //     for(var i=0; i<messages.length; i++) {
-  //       html += messages[i] + '<br />';
-  //     }
-  //     content.innerHTML = html;
-  //   } else {
-  //     console.log("There is a problem:", data);
-  //   }
-  // });
 /************* models and collections ***************/
 
 var App = Backbone.Model.extend({
@@ -23,13 +11,13 @@ var App = Backbone.Model.extend({
   },
 
   initialize: function() {
-    this.isLeader = false;
-    this.playerName = '??'
-    this.players = new Players();
+    this.set('isLeader', false);
+    this.set('playerName', '??');
+    this.set('players', new Players());
     var that = this; 
     window.socket.on('newPlayerJoined', function(data) {
       console.log('heard message');
-      that.players.makePlayer(data.playerName, false);
+      that.get('players').makePlayer(data.playerName, false);
     });
     this.promptPlayerName();    //prompts for player name
   },
@@ -49,12 +37,13 @@ var App = Backbone.Model.extend({
     $('#nameForm').submit(function(e){
       e.preventDefault();
       $('#nameModal').modal('toggle');
-      that.playerName = $('#nameInput').val();
+      that.set('playerName', $('#nameInput').val());
 
       window.socket.emit('newPlayer', {
-        playerName: this.playerName
+        playerName: that.get('playerName')
       });
-      that.players.makePlayer( that.playerName, true );
+      debugger;
+      that.get('players').makePlayer( that.get('playerName'), true );
     });
     $('#nameModal').modal();
   }
@@ -78,7 +67,7 @@ var App = Backbone.Model.extend({
 var Player = Backbone.Model.extend({
 
   initialize: function(){
-    this.leader = false;
+    this.set('leader', false);
   },
 
   vote: function(){
@@ -116,7 +105,6 @@ var PlayerView = Backbone.View.extend({
   template: _.template( $('#playerTemplate').html() ),
 
   render: function(){
-    debugger;
     this.$el.html( this.template(this.model.toJSON()) );
     return this;
   },
@@ -172,6 +160,7 @@ var PlayersView = Backbone.View.extend({
   },
 
   addOne: function(player) {
+    console.log('adding one');
     var view = new PlayerView( {model: player} );
     this.$el.append(view.render().el);
   }
@@ -186,7 +175,7 @@ var AppView = Backbone.View.extend({
   },
 
   initialize: function(){
-    this.playersView = new PlayersView( {collection: this.model.players} );
+    this.playersView = new PlayersView( {collection: this.model.get('players')} );
     // this.listenToOnce(this.model, 'change : gamestart', this.distributeIdentities);
     // this.listenTo(this.model, 'change : voting', this.promptVote);
   }

@@ -38,7 +38,6 @@ io.sockets.on('connection', function (socket) {
     });
     game.players.push(data);
     socket.broadcast.emit('newPlayerJoined', data);
-    console.log(game.players);
   });
 
 
@@ -47,10 +46,6 @@ io.sockets.on('connection', function (socket) {
   socket.on('send', function (data) {
     io.sockets.emit('message', data);
     socket.broadcast.emit('message', {message: 'hello there'});
-  });
-  socket.on('appEvent', function(data) {
-    io.sockets.emit('returnMessage', {'message': 'Hi from the server'});
-    console.log(data);
   });
 });
 
