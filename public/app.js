@@ -16,9 +16,15 @@
 /************* models and collections ***************/
 
 var App = Backbone.Model.extend({
+  defaults: function() {
+    return {
+      playerName: "anonymous"
+    }
+  },
 
   initialize: function() {
     this.isLeader = false;
+    this.playerName = '??'
     this.players = new Players();
     var that = this; 
     window.socket.on('newPlayerJoined', function(data) {
@@ -43,10 +49,10 @@ var App = Backbone.Model.extend({
     $('#nameForm').submit(function(e){
       e.preventDefault();
       $('#nameModal').modal('toggle');
-      this.playerName = $('#nameInput').val();
+      that.playerName = $('#nameInput').val();
 
       window.socket.emit('newPlayer', {
-        name: this.playerName
+        playerName: this.playerName
       });
       that.players.makePlayer( that.playerName, true );
     });
@@ -90,7 +96,7 @@ var Players = Backbone.Collection.extend({
   },
 
   makePlayer: function(playerName, isMe){
-    this.add( {name: playerName, isMe: isMe} );
+    this.add( {playerName: playerName, isMe: isMe} );
   }
 });
 
@@ -99,143 +105,137 @@ var Players = Backbone.Collection.extend({
 
 // /****************** views ************************/
 
-// var AppView = Backbone.View.extend({
-//   el: $('body'),
 
-//   events: {
-//     'click #chooseTeamButton': "chooseTeam"
-//   },
+var PlayerView = Backbone.View.extend({
+  className: 'span3 offset2 playerView',
 
-//   initialize: function(){
-//     this.playersView = new PlayersView( {collection: this.model.players} );
-//     this.listenToOnce(this.model, 'change : gamestart', this.distributeIdentities);
-//     this.listenTo(this.model, 'change : voting', this.promptVote);
-//   },
+  events: {
+    // 'click': 'selected'
+  },
 
-//   chooseTeam: function(e) {
-//     e.preventDefault();
-//     if (me.team.length !== 3) {
-//       alert('you need to choose 3 members for this mission');
-//       return;
-//     } else {
-//       this.model.set({
-//         'voting': true,
-//         'teamMembers': me.team
-//       });
-//       $('#chooseTeamButton').attr('disabled', 'disabled');
-//     }
-//   },
+  template: _.template( $('#playerTemplate').html() ),
 
-//   promptVote: function() {
-//     $('approveButton').click(function(e){
-//       e.preventDefault();
-//     });
-//     $('disapproveButton').click(function(e){
-//       e.preventDefault();
-//       this.model.set('disapproveVotes', this.model.get('disapproveVotes').push(window.playerName));
-//     });
-//     $('#votingModal').modal();
-//   },
+  render: function(){
+    debugger;
+    this.$el.html( this.template(this.model.toJSON()) );
+    return this;
+  },
 
-//   distributeIdentities: function() {
-//     console.log('in AppView distributing identities');
+  initialize: function() {
+    this.listenTo(this.model, 'destroy', this.remove);
+    this.listenTo(this.model, 'change', this.modelChanged);
+// this.listenTo(this.model, 'change : identity', this.showIdentity);
+    // this.listenTo(this.model, 'change : selected', this.toggleSelected);
+  }
 
-//     //run game logic only on the leader to avoid conflict
-//     if ( window.playerName === this.model.players.models[0].get('name') ) {
-//       alert('you are the leader!!');
-//       me.currLeader = true;
-//       $('#chooseTeamButton').removeAttr('disabled');
-//       var shuffled = _.shuffle([1,2,3,4,5,6,7,8]);
-//       for (var i = 0; i < this.model.players.length; i++) {
-//         var identity = shuffled.pop();
-//         if (identity < 4) {
-//           this.model.players.models[i].set({identity: 'spy'});
-//         } else {
-//           this.model.players.models[i].set({identity: 'resistance'});
-//         }
-//       }
-//       this.model.set({'round': 1});
-//     }
-//   }
+  // modelChanged: function() {
+  //   console.log("model changed");
+  // }
 
+  // showIdentity: function() {
+  //   if ( window.playerName === this.model.get('name') ) { //if you are this player
+  //     if ( this.model.get('identity') === 'resistance') {//resistance
+  //       $('#resistanceModal').modal();
+  //     } else {
+  //       $('#spyModal').modal();
+  //     }
+  //   }
+  // },
 
-// });
+  // selected: function() {
+  //   if (me.currLeader) {
+  //     var index = me.team.indexOf(this.model);
+  //     if (index === -1) {
+  //       this.model.set('selected', 'true');
+  //       me.team.push(this.model);
+  //     } else {
+  //       me.team.splice(index, 1);
+  //     }
+  //   }
+  // },
+
+  // toggleSelected: function() {
+  //   if (this.model.selected === true) {
+  //     this.$el.css({'border': "1px dotted red"});
+  //   } else {
+  //     this.$el.css({'border': "none"});
+  //   }
+  // }
+});
 
 
-// var PlayersView = Backbone.View.extend({
+var PlayersView = Backbone.View.extend({
+  el: $('#playersView'),
 
-//   el: $('#playersView'),
+  initialize: function(){
+    this.listenTo(this.collection, 'add', this.addOne);
+  },
 
-//   initialize: function(){
-//     // _.bindAll(this, 'addOne');
-//     // window.vent.on('newModelAdded', this.addOne);
-//     this.listenTo(this.collection, 'add', this.addOne);
-//   },
-
-//   addOne: function(player) {
-//     var view = new PlayerView( {model: player} );
-//     this.$el.append(view.render().el);
-//   }
-
-// });
+  addOne: function(player) {
+    var view = new PlayerView( {model: player} );
+    this.$el.append(view.render().el);
+  }
+});
 
 
-// var PlayerView = Backbone.View.extend({
+var AppView = Backbone.View.extend({
+  el: $('body'),
 
-//   className: 'span3 offset2 playerView',
+  events: {
+    // 'click #chooseTeamButton': "chooseTeam"
+  },
 
-//   events: {
-//     'click': 'selected'
-//   },
+  initialize: function(){
+    this.playersView = new PlayersView( {collection: this.model.players} );
+    // this.listenToOnce(this.model, 'change : gamestart', this.distributeIdentities);
+    // this.listenTo(this.model, 'change : voting', this.promptVote);
+  }
 
-//   template: _.template( $('#playerTemplate').html() ),
+  // chooseTeam: function(e) {
+  //   e.preventDefault();
+  //   if (me.team.length !== 3) {
+  //     alert('you need to choose 3 members for this mission');
+  //     return;
+  //   } else {
+  //     this.model.set({
+  //       'voting': true,
+  //       'teamMembers': me.team
+  //     });
+  //     $('#chooseTeamButton').attr('disabled', 'disabled');
+  //   }
+  // },
 
-//   render: function(){
-//     this.$el.html( this.template(this.model.toJSON()) );
-//     return this;
-//   },
+  // promptVote: function() {
+  //   $('approveButton').click(function(e){
+  //     e.preventDefault();
+  //   });
+  //   $('disapproveButton').click(function(e){
+  //     e.preventDefault();
+  //     this.model.set('disapproveVotes', this.model.get('disapproveVotes').push(window.playerName));
+  //   });
+  //   $('#votingModal').modal();
+  // },
 
-//   initialize: function() {
-//     this.listenTo(this.model, 'destroy', this.remove);
-//     this.listenTo(this.model, 'change', this.modelChanged);
-//     this.listenTo(this.model, 'change : identity', this.showIdentity);
-//     this.listenTo(this.model, 'change : selected', this.toggleSelected);
-//   },
+  // distributeIdentities: function() {
+  //   console.log('in AppView distributing identities');
 
-//   modelChanged: function() {
-//     console.log("model changed");
-//   },
-
-//   showIdentity: function() {
-//     if ( window.playerName === this.model.get('name') ) { //if you are this player
-//       if ( this.model.get('identity') === 'resistance') {//resistance
-//         $('#resistanceModal').modal();
-//       } else {
-//         $('#spyModal').modal();
-//       }
-//     }
-//   },
-
-//   selected: function() {
-//     if (me.currLeader) {
-//       var index = me.team.indexOf(this.model);
-//       if (index === -1) {
-//         this.model.set('selected', 'true');
-//         me.team.push(this.model);
-//       } else {
-//         me.team.splice(index, 1);
-//       }
-//     }
-//   },
-
-//   toggleSelected: function() {
-//     if (this.model.selected === true) {
-//       this.$el.css({'border': "1px dotted red"});
-//     } else {
-//       this.$el.css({'border': "none"});
-//     }
-//   }
-// });
-
+  //   //run game logic only on the leader to avoid conflict
+  //   if ( window.playerName === this.model.players.models[0].get('name') ) {
+  //     alert('you are the leader!!');
+  //     me.currLeader = true;
+  //     $('#chooseTeamButton').removeAttr('disabled');
+  //     var shuffled = _.shuffle([1,2,3,4,5,6,7,8]);
+  //     for (var i = 0; i < this.model.players.length; i++) {
+  //       var identity = shuffled.pop();
+  //       if (identity < 4) {
+  //         this.model.players.models[i].set({identity: 'spy'});
+  //       } else {
+  //         this.model.players.models[i].set({identity: 'resistance'});
+  //       }
+  //     }
+  //     this.model.set({'round': 1});
+  //   }
+  // }
 
 
+});

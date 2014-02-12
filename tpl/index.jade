@@ -40,6 +40,17 @@ html(lang="en")
         button.btn(data-dismiss='modal', aria-hidden='true') Close
         button.btn.btn-primary(data-dismiss='modal', aria-hidden='true') Continue
 
+    //templates
+    script#fireMessage(type='text/template')
+      #message.clearfix
+        .senderName 
+          p <%- name %>:
+        .messageContent 
+          p <%- text %>
+
+    script#playerTemplate(type='text/template')
+      header <%- playerName %>
+      img(src="./img/spy.png")
 
     // dependencies        
     script(src='/lib/jquery/jquery.js')
@@ -56,11 +67,5 @@ html(lang="en")
     script(src='/app.js')
     script(src='/chat.js')
 
-    //templates
-    script#fireMessage(type='text/template')
-      #message.clearfix
-        .senderName 
-          p <%- name %>:
-        .messageContent 
-          p <%- text %>
+
 
