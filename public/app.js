@@ -15,12 +15,7 @@ var App = Backbone.Model.extend({
     this.set('playerName', '??');
     this.set('players', new Players());
     var that = this; 
-    window.socket.on('newPlayerJoined', function(data) {
-      console.log('heard message');
-      that.get('players').makePlayer(data.playerName, false);
-    });
-    this.promptPlayerName();    //prompts for player name
-  },
+  }
 
 
   //   this.startGame();
@@ -31,22 +26,6 @@ var App = Backbone.Model.extend({
 
   //   this.on('change : gameStart', this.startNewGame);
   // },
-
-  promptPlayerName: function() {
-    var that = this;
-    $('#nameForm').submit(function(e){
-      e.preventDefault();
-      $('#nameModal').modal('toggle');
-      that.set('playerName', $('#nameInput').val());
-
-      window.socket.emit('newPlayer', {
-        playerName: that.get('playerName')
-      });
-      debugger;
-      that.get('players').makePlayer( that.get('playerName'), true );
-    });
-    $('#nameModal').modal();
-  }
 
   // startGame: function() {
   //   var that = this;
@@ -175,10 +154,33 @@ var AppView = Backbone.View.extend({
   },
 
   initialize: function(){
+    var that = this;
     this.playersView = new PlayersView( {collection: this.model.get('players')} );
+    window.socket.on('socketId', function(data){
+      that.model.set('socketId', data.socketId);
+    });
+    window.socket.on('newPlayerJoined', function(data) {
+      that.model.get('players').makePlayer(data.playerName, false);
+    });
     // this.listenToOnce(this.model, 'change : gamestart', this.distributeIdentities);
     // this.listenTo(this.model, 'change : voting', this.promptVote);
+    this.promptPlayerName();
+  },
+
+  promptPlayerName: function() {
+    var that = this;
+    $('#nameForm').submit(function(e){
+      e.preventDefault();
+      $('#nameModal').modal('toggle');
+      that.model.set('playerName', $('#nameInput').val());
+      window.socket.emit('newPlayer', {
+        playerName: that.model.get('playerName')
+      });
+      that.model.get('players').makePlayer( that.model.get('playerName'), true );
+    });
+    $('#nameModal').modal();
   }
+
 
   // chooseTeam: function(e) {
   //   e.preventDefault();

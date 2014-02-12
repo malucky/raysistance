@@ -34,18 +34,11 @@ io.sockets.on('connection', function (socket) {
   //new player created
   socket.on('newPlayer', function (data) {
     _.each(game.players, function(player) {
-      socket.emit('newPlayerJoined', player);
+      socket.emit('newPlayerJoined', player[1]);
     });
-    game.players.push(data);
+    game.players.push([socket, data]);
+    socket.emit('socketId', {socketId: socket.id});
     socket.broadcast.emit('newPlayerJoined', data);
-  });
-
-
-
-  socket.emit('message', { message: 'welcome to the chat' });
-  socket.on('send', function (data) {
-    io.sockets.emit('message', data);
-    socket.broadcast.emit('message', {message: 'hello there'});
   });
 });
 
