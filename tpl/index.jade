@@ -2,29 +2,65 @@ doctype html
 html(lang="en")
   head
     title= "Raysistance"
-    // script(src='/app.js')
+    //script(src='/app.js')
     link(href='/')
-    // script(src='/socket.io/socket.io.js')
+    script(src='/socket.io/socket.io.js')
   body
-    #main.row
-      #playerView.span12
+    #main
+      #playerView.clearfix
         header="Players"
-      #chat.span12
+      #chat.wordwrap.clearfix
         header="Chat"
         #messagesDiv.table.table-bordered
         textarea#messageInput(type='text', placeholder="Message")
       button#startButton.btn(role='button')="Start Game!"
       button#chooseTeamButton.btn(disabled, role='button')="Choose Your Team!"
 
-    script(src='http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js')
-    script(src='http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js')
-    script(src='/bower_components/backbone/backbone.js')
-    script(src='/bower_components/firebase/firebase.js')
-    script(src='/bower_components/backfire/backbone-firebase.js')
-    script(src='/bootstrap/js/bootstrap.js')
-    link(rel='stylesheet', type='text/css', href='./bootstrap/css/bootstrap.css')
-    link(rel='stylesheet', type='text/css', href='./styles.css')
-    // main.js
+    //name prompt modal
+    #nameModal.modal.hide.fade(tabindex='-1', role='dialog', aria-labelledby='nameModalLabel', aria-hidden='true')
+      .modal-header
+        button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
+        h3#nameModalLabel Modal header
+      .modal-body
+        p So ... what's your name?
+        form#nameForm
+          input#nameInput(type='text', placeholder='Tank')
+          input(type='submit')
+          // class="btn btn-primary" data-dismiss="modal" aria-hidden="true"
+      .modal-footer
+    //resistance identity modal
+    #resistanceModal.modal.hide.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel', aria-hidden='true')
+      .modal-header
+        button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
+        h3#myModalLabel You're on the Resistance!!
+      .modal-body
+        p Choose your team wisely...the fate of the future lies on YOUR shoulders!
+        img.identity(src='./img/resistance.png')
+      .modal-footer
+        button.btn(data-dismiss='modal', aria-hidden='true') Close
+        button.btn.btn-primary(data-dismiss='modal', aria-hidden='true') Continue
+
+
+    // dependencies        
+    script(src='/lib/jquery/jquery.js')
+    script(src='/lib/underscore/underscore.js')
+    script(src='/lib/backbone/backbone.js')
+    script(src='/lib/firebase/firebase.js')
+    script(src='/lib/backfire/backbone-firebase.js')
+    script(src='/lib/bootstrap/js/bootstrap.js')
+    link(rel='stylesheet', type='text/css', href='/lib/bootstrap/css/bootstrap.css')
+    link(rel='stylesheet', type='text/css', href='/styles.css')
+    
+    // scripts
     script(src='/main.js')
     script(src='/app.js')
     script(src='/chat.js')
+
+    //templates
+    script#fireMessage(type='text/template')
+      #message.clearfix
+        .senderName 
+          p <%- name %>:
+        .messageContent 
+          p <%- text %>
+

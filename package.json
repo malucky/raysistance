@@ -5,7 +5,12 @@
     "dependencies": {
         "socket.io": "latest",
         "express": "latest",
-        "jade": "latest"
+        "jade": "latest",
+        "jquery": "latest",
+        "underscore": "latest",
+        "backbone": "latest",
+        "firebase": "lateset",
+        "backfire": "latest"
     },
     "author": "developer"
 }
