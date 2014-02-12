@@ -18,13 +18,32 @@ var io = require('socket.io').listen(app.listen(port));
 
 /* game logistics */
 var game = {
-  requiredNumOfPlayers: 8, 
+  requiredNumOfPlayers: 2,  //for testing ********
   currLeader: null,
   players: [],
   currTeam: [],
   round: 0
 };
 
+
+var distributeIdentities = function() {
+  var arr = [];
+  for (var i = 0; i < game.requiredNumOfPlayers; i++) {
+    arr.push(i);
+  }
+  var shuffled = _.shuffle(arr);
+  for (var i = 0; i < game.players.length; i++) {
+    if (shuffled.pop() < 4) {
+      game.players[i][0].emit('identity', {'identity': 'spy'});
+    } else {
+      game.players[i][0].emit('identity', {'identity': 'spy'});
+    }
+  } 
+};
+
+var startGame = function() {
+  distributeIdentities();
+};
 
 
 
@@ -39,6 +58,9 @@ io.sockets.on('connection', function (socket) {
     game.players.push([socket, data]);
     socket.emit('socketId', {socketId: socket.id});
     socket.broadcast.emit('newPlayerJoined', data);
+    if (game.players.length === game.requiredNumOfPlayers) {
+      startGame();
+    }
   });
 });
 

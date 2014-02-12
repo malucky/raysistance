@@ -95,7 +95,7 @@ var PlayerView = Backbone.View.extend({
     // this.listenTo(this.model, 'change : selected', this.toggleSelected);
   }
 
-  // modelChanged: function() {
+  // modelChanged: function() 
   //   console.log("model changed");
   // }
 
@@ -162,8 +162,10 @@ var AppView = Backbone.View.extend({
     window.socket.on('newPlayerJoined', function(data) {
       that.model.get('players').makePlayer(data.playerName, false);
     });
-    // this.listenToOnce(this.model, 'change : gamestart', this.distributeIdentities);
-    // this.listenTo(this.model, 'change : voting', this.promptVote);
+    window.socket.on('identity', function(data) {
+      that.model.set('identity', data.identity);
+      that.displayIdentity();
+    });
     this.promptPlayerName();
   },
 
@@ -179,6 +181,14 @@ var AppView = Backbone.View.extend({
       that.model.get('players').makePlayer( that.model.get('playerName'), true );
     });
     $('#nameModal').modal();
+  },
+
+  displayIdentity: function() {
+    if ( this.model.get('identity') === 'resistance') {//resistance
+      $('#resistanceModal').modal();
+    } else {
+      $('#spyModal').modal();
+    }
   }
 
 

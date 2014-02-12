@@ -39,6 +39,17 @@ html(lang="en")
       .modal-footer
         button.btn(data-dismiss='modal', aria-hidden='true') Close
         button.btn.btn-primary(data-dismiss='modal', aria-hidden='true') Continue
+    //spy identity modal 
+    #spyModal.modal.hide.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel', aria-hidden='true')
+      .modal-header
+        button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
+        h3#myModalLabel You are a SPY!!
+      .modal-body
+        p Your mission is to sabotage the mission! Become one of them ... gain their trust ... and foster discord
+        img.identity(src='./img/spy_1.png')
+      .modal-footer
+        button.btn(data-dismiss='modal', aria-hidden='true') Close
+        button.btn.btn-primary(data-dismiss='modal', aria-hidden='true') Continue
 
     //templates
     script#fireMessage(type='text/template')
