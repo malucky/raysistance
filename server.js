@@ -1,6 +1,7 @@
 var express = require("express");
 var app = express();
 var port = 3700;
+var _ = require('underscore');
  
 app.set('views', __dirname + '/tpl');
 app.set('view engine', "jade");
@@ -30,6 +31,18 @@ var game = {
 
 /* socket events */
 io.sockets.on('connection', function (socket) {
+  //new player created
+  socket.on('newPlayer', function (data) {
+    _.each(game.players, function(player) {
+      socket.emit('newPlayerJoined', player);
+    });
+    game.players.push(data);
+    socket.broadcast.emit('newPlayerJoined', data);
+    console.log(game.players);
+  });
+
+
+
   socket.emit('message', { message: 'welcome to the chat' });
   socket.on('send', function (data) {
     io.sockets.emit('message', data);

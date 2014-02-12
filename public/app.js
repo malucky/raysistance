@@ -1,10 +1,5 @@
 /* Backbone models, views, and collections */
 //local storage
-var me = {
-  currLeader: false,
-  team: []
-};
-
 
   // socket.on('message', function (data) {
   //   if(data.message) {
@@ -23,16 +18,14 @@ var me = {
 var App = Backbone.Model.extend({
 
   initialize: function() {
-    window.socket.emit('appEvent', {
-      name: 'ray'
-    });
-    window.socket.on('returnMessage', function(data){
-      console.log(data);
-    });
     this.isLeader = false;
-    // this.players = new Players();
+    this.players = new Players();
+    var that = this; 
+    window.socket.on('newPlayerJoined', function(data) {
+      console.log('heard message');
+      that.players.makePlayer(data.playerName, false);
+    });
     this.promptPlayerName();    //prompts for player name
-
   },
 
 
@@ -51,9 +44,12 @@ var App = Backbone.Model.extend({
       e.preventDefault();
       $('#nameModal').modal('toggle');
       this.playerName = $('#nameInput').val();
-      // that.players.makePlayer( window.playerName );
+
+      window.socket.emit('newPlayer', {
+        name: this.playerName
+      });
+      that.players.makePlayer( that.playerName, true );
     });
-    debugger;
     $('#nameModal').modal();
   }
 
@@ -73,34 +69,30 @@ var App = Backbone.Model.extend({
   // }
 });
 
-// var Player = Backbone.Model.extend({
+var Player = Backbone.Model.extend({
 
-//   initialize: function(){
-//     this.leader = false;
-//   },
+  initialize: function(){
+    this.leader = false;
+  },
 
-//   vote: function(){
-//     //prompt for approve or deny
-//   }
-// });
+  vote: function(){
+    //prompt for approve or deny
+  }
+});
 
-// var Players = Backbone.Firebase.Collection.extend({
+var Players = Backbone.Collection.extend({
+  model: Player,
 
-//   model: Player,
+  initialize: function(){
+    this.on('destroy', function() {
+      console.log('listened to destroy in collection');
+    });
+  },
 
-//   firebase: new Firebase("https://dazzling-fire-9595.firebaseio.com/raysistance/players"),
-
-//   initialize: function(){
-//     this.on('destroy', function() {
-//       console.log('listened to destroy in collection');
-//     });
-//     this.selected = false;
-//   },
-
-//   makePlayer: function(playerName){
-//     this.add( {name: playerName} );
-//   }
-// });
+  makePlayer: function(playerName, isMe){
+    this.add( {name: playerName, isMe: isMe} );
+  }
+});
 
 
 
