@@ -152,6 +152,8 @@ var AppView = Backbone.View.extend({
 
   events: {
     // 'click #chooseTeamButton': "chooseTeam"
+    'click .approveButton': 'approveTeam',
+    'click .disapproveButton': 'disapproveTeam'
   },
 
   initialize: function(){
@@ -198,7 +200,10 @@ var AppView = Backbone.View.extend({
       alert(data.message);
     });
     window.socket.on('voteOnTeam', function(){
-      console.log('time to vote!');
+      if (that.model.get('isLeader')) {
+        $('#chooseTeamButton').attr('disabled', 'disabled');
+      }
+      $('#voteModal').modal();
     });
     this.promptPlayerName();
   },
@@ -223,6 +228,16 @@ var AppView = Backbone.View.extend({
     } else {
       $('#spyModal').modal();
     }
+  },
+
+  approveTeam: function() {
+    console.log('approved team');
+    window.socket.emit('approve', {});
+  },
+
+  disapproveTeam: function() {
+    console.log('disapproved team');
+    window.socket.emit('disapprove', {});
   }
 
 

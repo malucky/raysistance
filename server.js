@@ -18,11 +18,12 @@ var io = require('socket.io').listen(app.listen(port));
 
 /* game logistics */
 var game = {
-  requiredNumOfPlayers: 2,  //for testing ********
+  requiredNumOfPlayers: 3,  //for testing ********
   currLeader: null,
   players: [],
   currTeam: {},
   teamMemberCount: 0,
+  teamMemberByRound: [3,4,4,5,5],
   round: 0
 };
 
@@ -87,11 +88,17 @@ io.sockets.on('connection', function (socket) {
     }
   });
   socket.on('submitTeam', function() {
-    if (game.teamMemberCount === game.requiredNumOfPlayers) {
+    if (game.teamMemberCount === game.teamMemberByRound[game.round]) {
       io.sockets.emit('voteOnTeam', {});
     } else {
-      socket.emit('invalidTeam', {'message': "Need to pick " + game.requiredNumOfPlayers + " team members!"});
+      socket.emit('invalidTeam', {'message': "Need to pick " + game.teamMemberByRound[game.round] + " team members!"});
     }
+  });
+  socket.on('approve', function(){
+    console.log(socket.id, ' approved');
+  });
+  socket.on('disapprove', function(){
+    console.log(socket.id, ' disapproved');
   });
 });
 

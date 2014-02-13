@@ -51,6 +51,17 @@ html(lang="en")
         button.btn(data-dismiss='modal', aria-hidden='true') Close
         button.btn.btn-primary(data-dismiss='modal', aria-hidden='true') Continue
 
+    //vote team modal
+    #voteModal.modal.hide.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel', aria-hidden='true')
+      .modal-header
+        button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
+        h3#myModalLabel Vote to Approve Team
+      .modal-body
+        p Do you want this team to go on the mission?
+      .modal-footer
+        button.btn.disapproveButton(data-dismiss='modal', aria-hidden='true') Disapprove
+        button.btn.btn-primary.approveButton(data-dismiss='modal', aria-hidden='true') Approve
+
     //templates
     script#fireMessage(type='text/template')
       #message.clearfix
