@@ -49,3 +49,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3b679e', end
   margin: 5px;
   margin-left: 10px;
 }
+
+.teamMember {
+  border: 1px dotted blue;
+}

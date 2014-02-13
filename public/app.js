@@ -59,7 +59,6 @@ var Players = Backbone.Collection.extend({
 
   initialize: function(){
     this.on('destroy', function() {
-      console.log('listened to destroy in collection');
     });
   },
 
@@ -98,6 +97,8 @@ var PlayerView = Backbone.View.extend({
   initialize: function() {
     this.listenTo(this.model, 'destroy', this.remove);
     this.listenTo(this.model, 'change : isLeader', this.modelChanged);
+    this.listenTo(this.model, 'teamMemberAdded', this.teamMemberAdded);
+    this.listenTo(this.model, 'teamMemberRemoved', this.teamMemberRemoved);
 // this.listenTo(this.model, 'change : identity', this.showIdentity);
     // this.listenTo(this.model, 'change : selected', this.toggleSelected);
   },
@@ -112,6 +113,14 @@ var PlayerView = Backbone.View.extend({
         socketId: that.model.get('socketId')
       });
     }
+  },
+
+  teamMemberAdded: function() {
+    this.$el.addClass('teamMember');
+  },
+
+  teamMemberRemoved: function() {
+    this.$el.removeClass('teamMember');
   }
 
   // toggleSelected: function() {
@@ -132,7 +141,6 @@ var PlayersView = Backbone.View.extend({
   },
 
   addOne: function(player) {
-    console.log('adding one');
     var view = new PlayerView( {model: player} );
     this.$el.append(view.render().el);
   }
@@ -165,10 +173,22 @@ var AppView = Backbone.View.extend({
       that.model.get('me').set('isLeader', true);
     });
     window.socket.on('nominateMember', function(data) {
-      console.log('member added');
+      var models = that.model.get('players').models;
+      for (var i = 0; i < models.length; i++) {
+        if (models[i].get('socketId') === data.socketId) {
+          models[i].trigger('teamMemberAdded');
+          break;
+        }
+      }
     });
     window.socket.on('removeMember', function(data) {
-      console.log('member removed');
+      var models = that.model.get('players').models;
+      for (var i = 0; i < models.length; i++) {
+        if (models[i].get('socketId') === data.socketId) {
+          models[i].trigger('teamMemberRemoved');
+          break;
+        }
+      }
     });
     this.promptPlayerName();
   },
