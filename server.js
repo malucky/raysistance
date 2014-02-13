@@ -22,6 +22,7 @@ var game = {
   currLeader: null,
   players: [],
   currTeam: {},
+  teamMemberCount: 0,
   round: 0
 };
 
@@ -72,15 +73,24 @@ io.sockets.on('connection', function (socket) {
   });
   socket.on('select', function(data) {
     if (game.currTeam[data.socketId]) {
-      game.currTeam[data.socketId] = false;
+      delete game.currTeam[data.socketId];
+      game.teamMemberCount--;
       io.sockets.emit('removeMember', {
         socketId: data.socketId
       });
     } else {
       game.currTeam[data.socketId] = true;
+      game.teamMemberCount++;
       io.sockets.emit('nominateMember', {
         socketId: data.socketId
       });
+    }
+  });
+  socket.on('submitTeam', function() {
+    if (game.teamMemberCount === game.requiredNumOfPlayers) {
+      io.sockets.emit('voteOnTeam', {});
+    } else {
+      socket.emit('invalidTeam', {'message': "Need to pick " + game.requiredNumOfPlayers + " team members!"});
     }
   });
 });

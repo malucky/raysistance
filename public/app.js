@@ -155,6 +155,9 @@ var AppView = Backbone.View.extend({
   },
 
   initialize: function(){
+    this.$el.find('#chooseTeamButton').on('click', function() {
+      window.socket.emit('submitTeam', {});
+    });
     var that = this;
     this.playersView = new PlayersView( {collection: this.model.get('players')} );
     window.socket.on('socketId', function(data){
@@ -170,7 +173,8 @@ var AppView = Backbone.View.extend({
     });
     window.socket.on('leader', function(data) {
       that.model.set('isLeader', true);
-      that.model.get('me').set('isLeader', true);
+      that.model.get('me').set('isLeader', true); //the player model (not app)
+      $('#chooseTeamButton').removeAttr('disabled');
     });
     window.socket.on('nominateMember', function(data) {
       var models = that.model.get('players').models;
@@ -189,6 +193,12 @@ var AppView = Backbone.View.extend({
           break;
         }
       }
+    });
+    window.socket.on('invalidTeam', function(data){
+      alert(data.message);
+    });
+    window.socket.on('voteOnTeam', function(){
+      console.log('time to vote!');
     });
     this.promptPlayerName();
   },
