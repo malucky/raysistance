@@ -99,6 +99,8 @@ var PlayerView = Backbone.View.extend({
     this.listenTo(this.model, 'change : isLeader', this.modelChanged);
     this.listenTo(this.model, 'teamMemberAdded', this.teamMemberAdded);
     this.listenTo(this.model, 'teamMemberRemoved', this.teamMemberRemoved);
+    this.listenTo(this.model, 'votedApprove', this.votedApprove);
+    this.listenTo(this.model, 'votedReject', this.votedReject);
 // this.listenTo(this.model, 'change : identity', this.showIdentity);
     // this.listenTo(this.model, 'change : selected', this.toggleSelected);
   },
@@ -121,15 +123,17 @@ var PlayerView = Backbone.View.extend({
 
   teamMemberRemoved: function() {
     this.$el.removeClass('teamMember');
-  }
+  },
 
-  // toggleSelected: function() {
-  //   if (this.model.selected === true) {
-  //     this.$el.css({'border': "1px dotted red"});
-  //   } else {
-  //     this.$el.css({'border': "none"});
-  //   }
-  // }
+  votedApprove: function() {
+    this.$el.addClass('approved');
+    console.log(this.model.get('socketId'), "approved");
+  },
+
+  votedReject: function() {
+    this.$el.addClass('rejected');
+    console.log(this.model.get('socketId'), "rejected");
+  }
 });
 
 
@@ -206,10 +210,14 @@ var AppView = Backbone.View.extend({
       $('#voteModal').modal();
     });
     window.socket.on('approved', function(data) {
+      $('#approvedModal').modal();
+      that.displayVotes(data);
       console.log('approved');
     });
     window.socket.on('rejected', function(data) {
+      $('#rejectedModal').modal();
       console.log('rejected');
+      that.displayVotes(data);
     });
 
     this.promptPlayerName();
@@ -245,54 +253,22 @@ var AppView = Backbone.View.extend({
   disapproveTeam: function() {
     console.log('disapproved team');
     window.socket.emit('disapprove', {});
+  },
+
+  displayVotes: function(data) {
+    var players = this.model.get('players');
+    data.votes.forEach( function(player) {
+      players.forEach( function(playerModel) {
+        if (player.socketId === playerModel.get('socketId')) {
+          if (player.vote) {//1 is approve
+            console.log('in displayVote approve');
+            playerModel.trigger('votedApprove');
+          } else { //0 is reject
+            playerModel.trigger('votedReject');
+            console.log('in displayVote reject');
+          }
+        }
+      });
+    });
   }
-
-
-  // chooseTeam: function(e) {
-  //   e.preventDefault();
-  //   if (me.team.length !== 3) {
-  //     alert('you need to choose 3 members for this mission');
-  //     return;
-  //   } else {
-  //     this.model.set({
-  //       'voting': true,
-  //       'teamMembers': me.team
-  //     });
-  //     $('#chooseTeamButton').attr('disabled', 'disabled');
-  //   }
-  // },
-
-  // promptVote: function() {
-  //   $('approveButton').click(function(e){
-  //     e.preventDefault();
-  //   });
-  //   $('disapproveButton').click(function(e){
-  //     e.preventDefault();
-  //     this.model.set('disapproveVotes', this.model.get('disapproveVotes').push(window.playerName));
-  //   });
-  //   $('#votingModal').modal();
-  // },
-
-  // distributeIdentities: function() {
-  //   console.log('in AppView distributing identities');
-
-  //   //run game logic only on the leader to avoid conflict
-  //   if ( window.playerName === this.model.players.models[0].get('name') ) {
-  //     alert('you are the leader!!');
-  //     me.currLeader = true;
-  //     $('#chooseTeamButton').removeAttr('disabled');
-  //     var shuffled = _.shuffle([1,2,3,4,5,6,7,8]);
-  //     for (var i = 0; i < this.model.players.length; i++) {
-  //       var identity = shuffled.pop();
-  //       if (identity < 4) {
-  //         this.model.players.models[i].set({identity: 'spy'});
-  //       } else {
-  //         this.model.players.models[i].set({identity: 'resistance'});
-  //       }
-  //     }
-  //     this.model.set({'round': 1});
-  //   }
-  // }
-
-
 });

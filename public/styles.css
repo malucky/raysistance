@@ -53,3 +53,11 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3b679e', end
 .teamMember {
   border: 1px dotted blue;
 }
+
+.approved {
+  background-color: blue;
+}
+
+.rejected {
+  background-color: red;
+}
