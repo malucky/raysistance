@@ -24,7 +24,9 @@ var game = {
   currTeam: {},
   teamMemberCount: 0,
   teamMemberByRound: [3,4,4,5,5],
-  round: 0
+  numVotesToLose: [1,1,1,2,1],
+  round: 0, 
+  votes: []
 };
 
 
@@ -49,6 +51,16 @@ var startGame = function() {
   game.players[game.currLeader][0].emit('leader', {});
 };
 
+var tallyVotes = function() {
+  var thisEvent = 'approved';
+  var voteResult = _.reduce(_.pluck(game.votes, 'vote'), function(memo, num){ return memo + num; }, 0);
+  if (voteResult >= game.numVotesToLose[game.round]) {
+    thisEvent = 'rejected';
+  }
+  io.sockets.emit(thisEvent, function() {
+    game.votes
+  });
+};
 
 
 
@@ -95,10 +107,16 @@ io.sockets.on('connection', function (socket) {
     }
   });
   socket.on('approve', function(){
-    console.log(socket.id, ' approved');
+    game.votes.push([{socketId: socket.id, vote: 0}]);
+    if (game.votes.length === game.requiredNumOfPlayers) {
+      tallyVotes();
+    }
   });
   socket.on('disapprove', function(){
-    console.log(socket.id, ' disapproved');
+    game.votes.push({socketId: socket.id, vote: 1});
+    if (game.votes.length === game.requiredNumOfPlayers) {
+      tallyVotes();
+    }
   });
 });
 

@@ -1,0 +1,3 @@
+- tally votes
+- show result
+- display votes submissions

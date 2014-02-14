@@ -205,6 +205,13 @@ var AppView = Backbone.View.extend({
       }
       $('#voteModal').modal();
     });
+    window.socket.on('approved', function(data) {
+      console.log('approved');
+    });
+    window.socket.on('rejected', function(data) {
+      console.log('rejected');
+    });
+
     this.promptPlayerName();
   },
 
