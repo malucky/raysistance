@@ -27,7 +27,9 @@ var game = {
   teamMemberByRound: [3,4,4,5,5],
   numVotesToLose: [1,1,1,2,1],
   round: 0, 
-  votes: []
+  votes: [], 
+  score: [],
+  missionVote: [[],[],[],[],[]]
 };
 
 
@@ -136,9 +138,24 @@ io.sockets.on('connection', function (socket) {
   socket.on('missionCompleted', function(data) {
     if (game.currTeam[socket.id]) { //if this is a team member
       if (data.result === 'success') {
+        game.missionVote[game.round].push(0);
         console.log('success');
       } else {
+        game.missionVote[game.round].push(1);
         console.log('fail');
+      }
+      if (game.missionVote[game.round].length === game.teamMemberByRound[game.round]) {
+        var score = _.reduce(game.missionVote[game.round], function(memo, num){ return memo + num; }, 0);
+        console.log(score);
+        if (score >= game.numVotesToLose[game.round]) {
+          game.score.push('fail');
+        } else {
+          game.score.push('success');
+        }
+        io.sockets.emit('missionResult', {
+          result: score,
+          numVotesToLose: game.numVotesToLose[game.round]
+        });
       }
     }
   });
