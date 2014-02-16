@@ -134,7 +134,9 @@ var AppView = Backbone.View.extend({
   events: {
     // 'click #chooseTeamButton': "chooseTeam"
     'click .approveButton': 'approveTeam',
-    'click .disapproveButton': 'disapproveTeam'
+    'click .disapproveButton': 'disapproveTeam',
+    'click .successButton': 'success',
+    'click .failButton': 'fail'
   },
 
   initialize: function(){
@@ -200,6 +202,8 @@ var AppView = Backbone.View.extend({
       that.displayVotes(data);
     });
     window.socket.on('mission', function() {
+      console.log('on mission');
+      $('#missionModal').modal();
     });
 
     this.promptPlayerName();
@@ -252,5 +256,13 @@ var AppView = Backbone.View.extend({
         }
       });
     });
+  },
+
+  success: function() {
+    window.socket.emit('missionCompleted', {result: 'success'});
+  },
+
+  fail: function() {
+    window.socket.emit('missionCompleted', {result: 'fail'});
   }
 });

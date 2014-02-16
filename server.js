@@ -62,10 +62,9 @@ var tallyVotes = function() {
       //send mission modal to the teamates
     setTimeout(function() {
       _.each(game.currTeam, function(isOnTeam, socketId) {
-        console.log('team member is :', game.clients[socketId]);
         game.clients[socketId].emit('mission');
       });
-    }, 10000);
+    }, 1000);
   } else { //failed
     //TODO clear team members
     //set leader to next person
@@ -108,7 +107,7 @@ io.sockets.on('connection', function (socket) {
         socketId: data.socketId
       });
     } else {
-      game.currTeam[data.socketId] = socket;
+      game.currTeam[data.socketId] = true;
       game.teamMemberCount++;
       io.sockets.emit('nominateMember', {
         socketId: data.socketId
@@ -132,6 +131,15 @@ io.sockets.on('connection', function (socket) {
     game.votes.push({socketId: socket.id, vote: 0});
     if (game.votes.length === game.requiredNumOfPlayers) {
       tallyVotes();
+    }
+  });
+  socket.on('missionCompleted', function(data) {
+    if (game.currTeam[socket.id]) { //if this is a team member
+      if (data.result === 'success') {
+        console.log('success');
+      } else {
+        console.log('fail');
+      }
     }
   });
 });
