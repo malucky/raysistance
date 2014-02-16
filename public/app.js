@@ -39,7 +39,6 @@ var Players = Backbone.Collection.extend({
   },
 
   makePlayer: function(socketId, playerName, isMe){
-    debugger;
     if (this.pluck('socketId').indexOf(socketId) !== -1) return; // prevent adding the same player twice
     var player = this.add({
       socketId: socketId,
@@ -197,7 +196,10 @@ var AppView = Backbone.View.extend({
     window.socket.on('rejected', function(data) {
       $('#rejectedModal').modal();
       console.log('rejected');
+      //logic to restart process but with next person as leader TODO
       that.displayVotes(data);
+    });
+    window.socket.on('mission', function() {
     });
 
     this.promptPlayerName();

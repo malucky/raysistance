@@ -18,6 +18,7 @@ var io = require('socket.io').listen(app.listen(port));
 
 /* game logistics */
 var game = {
+  clients: {},
   requiredNumOfPlayers: 3,  //for testing ********
   currLeader: null,
   players: [],
@@ -56,9 +57,23 @@ var tallyVotes = function() {
   var voteResult = _.reduce(_.pluck(game.votes, 'vote'), function(memo, num){ return memo + num; }, 0);
   if (voteResult > (game.requiredNumOfPlayers / 2)) {
     thisEvent = 'approved';
+    //TODO
+      //set timeout for 10 seconds
+      //send mission modal to the teamates
+    setTimeout(function() {
+      _.each(game.currTeam, function(isOnTeam, socketId) {
+        console.log('team member is :', game.clients[socketId]);
+        game.clients[socketId].emit('mission');
+      });
+    }, 10000);
+  } else { //failed
+    //TODO clear team members
+    //set leader to next person
+    //clear current leader
   }
   io.sockets.emit(thisEvent, { 
     votes: game.votes
+
   });
 };
 
@@ -67,6 +82,7 @@ var tallyVotes = function() {
 /* socket events */
 io.sockets.on('connection', function (socket) {
   //new player created
+  game.clients[socket.id] = socket;
   socket.on('newPlayer', function (data) {
     _.each(game.players, function(player) {
       socket.emit('newPlayerJoined', {
@@ -92,7 +108,7 @@ io.sockets.on('connection', function (socket) {
         socketId: data.socketId
       });
     } else {
-      game.currTeam[data.socketId] = true;
+      game.currTeam[data.socketId] = socket;
       game.teamMemberCount++;
       io.sockets.emit('nominateMember', {
         socketId: data.socketId

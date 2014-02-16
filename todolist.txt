@@ -10,4 +10,8 @@
 
 
 ISSUES
+  -refactor the server and app
+
+
+  ***DONE***
   -duplicate player for subsequent player if connection made first then player entered name  -> DONE
