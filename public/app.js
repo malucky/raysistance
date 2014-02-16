@@ -17,30 +17,6 @@ var App = Backbone.Model.extend({
     var that = this; 
   }
 
-
-  //   this.startGame();
-
-  //   this.teamMembers = [];
-
-  //   this.voting = false;
-
-  //   this.on('change : gameStart', this.startNewGame);
-  // },
-
-  // startGame: function() {
-  //   var that = this;
-  //   $('#startButton').click(function(e) {
-  //     e.preventDefault();
-  //     if (that.players.length === that.reqNumOfPlayers) {
-  //       that.set( {'gameStart': true} );
-
-  //     } else if (that.players.length < that.reqNumOfPlayers) {
-  //       alert("waiting for more players");
-  //     } else {
-  //       alert("too many players!");
-  //     }
-  //   });
-  // }
 });
 
 var Player = Backbone.Model.extend({
@@ -63,6 +39,8 @@ var Players = Backbone.Collection.extend({
   },
 
   makePlayer: function(socketId, playerName, isMe){
+    debugger;
+    if (this.pluck('socketId').indexOf(socketId) !== -1) return; // prevent adding the same player twice
     var player = this.add({
       socketId: socketId,
       playerName: playerName, 
@@ -167,10 +145,12 @@ var AppView = Backbone.View.extend({
     var that = this;
     this.playersView = new PlayersView( {collection: this.model.get('players')} );
     window.socket.on('socketId', function(data){
+      console.log('got socketId');
       that.model.set('socketId', data.socketId);
       that.model.get('me').set('socketId', data.socketId);
     });
     window.socket.on('newPlayerJoined', function(data) {
+      console.log('new player joined');
       that.model.get('players').makePlayer(data.socketId, data.playerName, false);
     });
     window.socket.on('identity', function(data) {

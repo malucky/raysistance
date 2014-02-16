@@ -1,3 +1,13 @@
-- tally votes
-- show result
-- display votes submissions
+- tally votes ->Done
+- show result ->Done
+- display votes submissions ->Done
+
+- logic to go on mission or resubmit team
+- modal to go on mission
+- tally up mission result
+- display mission result to all
+- move on to next round
+
+
+ISSUES
+  -duplicate player for subsequent player if connection made first then player entered name  -> DONE
