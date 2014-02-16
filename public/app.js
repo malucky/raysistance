@@ -206,9 +206,12 @@ var AppView = Backbone.View.extend({
       $('#missionModal').modal();
     });
     window.socket.on('missionResult', function(data) {
-      if (data.result >= data.numVotesToLose[]) {
+      if (data.result >= data.numVotesToLose) {
+        $('.NumOfFailureVotes').text(data.result + " ");
+        $('#missionFailureModal').modal();
         console.log('failure');
       } else {
+        $('#missionSuccessModal').modal();
         console.log('success');
       }
     });
